@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <radialGradient id="space" cx="38%" cy="30%" r="78%">
+      <stop offset="0" stop-color="#1d3b58"/>
+      <stop offset="0.55" stop-color="#0b1b30"/>
+      <stop offset="1" stop-color="#060d17"/>
+    </radialGradient>
+    <radialGradient id="ocean" cx="34%" cy="26%" r="78%">
+      <stop offset="0" stop-color="#65c4db"/>
+      <stop offset="0.48" stop-color="#236b91"/>
+      <stop offset="1" stop-color="#0c2948"/>
+    </radialGradient>
+    <linearGradient id="land" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#9bcdb0"/>
+      <stop offset="1" stop-color="#4f8e7d"/>
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop stop-color="#a5dfef" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#a5dfef" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+    <filter id="satGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="10" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <clipPath id="earthClip"><circle cx="512" cy="530" r="250"/></clipPath>
+  </defs>
+
+  <rect width="1024" height="1024" fill="url(#space)"/>
+  <g fill="#d9f5ff">
+    <circle cx="172" cy="196" r="4" opacity=".75"/><circle cx="826" cy="176" r="3" opacity=".7"/>
+    <circle cx="884" cy="346" r="5" opacity=".55"/><circle cx="128" cy="638" r="3" opacity=".55"/>
+    <circle cx="782" cy="778" r="4" opacity=".7"/><circle cx="248" cy="824" r="5" opacity=".45"/>
+    <circle cx="366" cy="128" r="2.5" opacity=".5"/><circle cx="708" cy="112" r="2.5" opacity=".45"/>
+  </g>
+
+  <circle cx="512" cy="530" r="320" fill="url(#glow)" filter="url(#soft)"/>
+
+  <g clip-path="url(#earthClip)">
+    <circle cx="512" cy="530" r="250" fill="url(#ocean)"/>
+    <path d="M354 363c42-46 99-78 156-82 20 23 18 49-8 67-15 10-34 14-42 32-8 19 3 39-6 56-13 24-52 20-69 42-12 16-4 39-16 54-15 19-45 16-70 13-20-3-39-2-56 4 0-75 35-146 111-206Z" fill="url(#land)"/>
+    <path d="M530 318c47-31 124-16 164 17 40 33 61 82 66 132-20 5-41 5-60-2-18-7-29-25-47-29-29-6-51 26-80 18-20-6-25-31-17-50 7-16 24-29 22-47-2-19-25-29-48-39Z" fill="url(#land)"/>
+    <path d="M623 482c34-2 78 15 92 46 10 24-2 51-18 72-15 20-34 38-41 62-8 27-3 59-22 80-12 13-32 17-48 9-24-12-29-43-35-69-7-31-21-65-9-94 9-22 31-36 44-56 11-16 17-33 37-50Z" fill="url(#land)"/>
+    <path d="M316 598c24-13 55-12 77 5 23 18 28 50 45 73 17 24 47 36 61 63 8 15 9 33 4 50-85-3-157-44-201-105-14-20-24-42-31-66 16-4 30-11 45-20Z" fill="#578f7f"/>
+    <ellipse cx="430" cy="410" rx="142" ry="70" fill="#d7f6ff" opacity=".12" transform="rotate(-18 430 410)"/>
+  </g>
+  <circle cx="512" cy="530" r="250" fill="none" stroke="#b6edff" stroke-width="13" opacity=".78"/>
+
+  <ellipse cx="512" cy="530" rx="394" ry="166" fill="none" stroke="#a5dfef" stroke-width="14" transform="rotate(-18 512 530)" opacity=".92"/>
+  <ellipse cx="512" cy="530" rx="394" ry="166" fill="none" stroke="#effcff" stroke-width="4" transform="rotate(-18 512 530)" opacity=".72"/>
+
+  <g transform="translate(833 344) rotate(-18)" filter="url(#satGlow)">
+    <circle r="32" fill="#f9d371"/>
+    <circle r="15" fill="#fff4bb"/>
+    <path d="M-46-18h-50v36h50M46-18h50v36H46" fill="#4d86ae" stroke="#b6edff" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M-44 0h88M0-36v72" stroke="#f7fbff" stroke-width="9" stroke-linecap="round"/>
+  </g>
+</svg>

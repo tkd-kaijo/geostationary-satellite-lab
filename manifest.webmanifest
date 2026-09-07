@@ -1,0 +1,25 @@
+{
+  "name": "静止衛星シミュレーション",
+  "short_name": "静止衛星",
+  "description": "静止衛星と比較軌道を宇宙・地上の2つの視点で観察する3Dシミュレーション",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b1423",
+  "theme_color": "#0b1423",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
