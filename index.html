@@ -289,11 +289,10 @@ const GL3D = (() => {
       gl.uniform1i(this.u.Sky,!!opt.sky);gl.uniform1i(this.u.Points,!!opt.points);gl.uniform1f(this.u.PointSize,opt.pointSize||2);
       if(opt.texture){gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,opt.texture);gl.uniform1i(this.u.Texture,0);}
       if(opt.depth===false)gl.disable(gl.DEPTH_TEST);
-      gl.lineWidth(opt.lineWidth||1);
       gl.depthMask(opt.write!==false&&color[3]>=.99);
       if(mesh.idx){gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,mesh.idx);gl.drawElements(mesh.mode,mesh.count,gl.UNSIGNED_SHORT,0);}
       else gl.drawArrays(mesh.mode,0,mesh.count);
-      gl.lineWidth(1);gl.depthMask(true);if(opt.depth===false)gl.enable(gl.DEPTH_TEST);
+      gl.depthMask(true);if(opt.depth===false)gl.enable(gl.DEPTH_TEST);
     }
   }
   return {I,mm,tr,sc,ry,rx,rz,perspective,look,project,rgba,sphere,cube,disk,Renderer};
@@ -340,13 +339,32 @@ function earthCanvas() {
   return c;
 }
 function line(points,mode='LINE_STRIP'){return renderer.mesh({p:points.flat()},mode);}
+function tube(points,radius,mode='LINE_STRIP',sides=8){
+  const p=[],n=[],idx=[];
+  const segment=(a,b)=>{
+    const delta=P.sub(b,a);if(P.norm(delta)<1e-6)return;
+    const d=P.unit(delta),ref=Math.abs(d[1])<.9?[0,1,0]:[1,0,0];
+    const u=P.unit(P.cross(d,ref)),v=P.cross(d,u),base=p.length/3;
+    for(const point of [a,b])for(let j=0;j<sides;j++){
+      const angle=P.TAU*j/sides,radial=P.add(P.mul(u,Math.cos(angle)),P.mul(v,Math.sin(angle)));
+      p.push(...P.add(point,P.mul(radial,radius)));n.push(...radial);
+    }
+    for(let j=0;j<sides;j++){
+      const k=(j+1)%sides,a0=base+j,a1=base+k,b0=base+sides+j,b1=base+sides+k;
+      idx.push(a0,b0,a1,a1,b0,b1);
+    }
+  };
+  if(mode==='LINES'){for(let i=0;i+1<points.length;i+=2)segment(points[i],points[i+1]);}
+  else for(let i=0;i+1<points.length;i++)segment(points[i],points[i+1]);
+  return renderer.mesh({p,n,idx});
+}
 function circle(radius,latitude=0,segments=240) {
   const p=[];for(let k=0;k<=segments;k++){const a=k/segments*P.TAU;p.push([radius*Math.cos(a),latitude,-radius*Math.sin(a)]);}return p;
 }
 function makeAssets(){
   sphere=renderer.mesh(G.sphere(56,112));cube=renderer.mesh(G.cube());disk=renderer.mesh(G.disk());
   earthTexture=renderer.texture(earthCanvas());
-  axis=line([[0,-1.6,0],[0,2.2,0]]);
+  axis=tube([[0,-1.6,0],[0,2.2,0]],.06);
   equator=line(circle(1.008));
   horizon=line(Array.from({length:361},(_,k)=>P.skyPoint(k,0,21)));
   const gp=[];
@@ -366,8 +384,8 @@ function rebuild(){
   const mp=[];for(let lat=-90;lat<=90;lat+=2)mp.push(P.geoPoint(lat,s.lon,1.012));meridian=line(mp);
   for(const id of P.IDS) {
     const pts=[];for(let k=0;k<=360;k++)pts.push(P.position(id,P.period(id,s)*k/360,s));
-    if(id==='shift'){const seg=[];for(let k=0;k<360;k++)if(Math.floor(k/4)%2===0)seg.push(pts[k],pts[k+1]);orbitMeshes[id]=line(seg,'LINES');}
-    else orbitMeshes[id]=line(pts);
+    if(id==='shift'){const seg=[];for(let k=0;k<360;k++)if(Math.floor(k/4)%2===0)seg.push(pts[k],pts[k+1]);orbitMeshes[id]=tube(seg,.06,'LINES');}
+    else orbitMeshes[id]=tube(pts,.06);
     if(id==='geo'||id==='shift'){pathMeshes[id]=null;continue;}
     // The complete relative circuit for equatorial satellites, or one sidereal
     // rotation for an inclined synchronous orbit. No "screen-space sine wave".
@@ -383,7 +401,7 @@ function rebuild(){
       }
       prev=curr;
     }
-    pathMeshes[id]=line(segments,'LINES');
+    pathMeshes[id]=tube(segments,.16,'LINES');
   }
   updateRows();updateInspectorValues();
 }
@@ -552,9 +570,9 @@ function drawSpace(){
   const root=G.ry(s.fixed?-P.TAU*s.t:0),earth=G.mm(root,G.ry(P.TAU*s.t));
   renderer.draw(stars,root,[.55,.70,.86,.55],{points:true,pointSize:dpr*1.45,write:false});
   renderer.draw(sphere,earth,[1,1,1,1],{texture:earthTexture,lit:true});
-  if(s.grid){renderer.draw(equator,earth,[.60,.88,.89,.7]);renderer.draw(axis,root,[.70,.81,.94,.70],{lineWidth:9});renderer.draw(meridian,earth,[.88,.95,1,.7]);}
+  if(s.grid){renderer.draw(equator,earth,[.60,.88,.89,.7]);renderer.draw(axis,root,[.70,.81,.94,.70]);renderer.draw(meridian,earth,[.88,.95,1,.7]);}
   if(s.plane)drawPlane(s.selected,root);
-  if(s.orbits)for(const id of P.IDS)if(s.enabled[id])renderer.draw(orbitMeshes[id],root,G.rgba(META[id].color,id===s.selected?.8:.5),{write:false,lineWidth:9});
+  if(s.orbits)for(const id of P.IDS)if(s.enabled[id])renderer.draw(orbitMeshes[id],root,G.rgba(META[id].color,id===s.selected?.8:.5),{write:false});
   const obs=P.observer(s.t,s),obsDisplay=s.fixed?P.ry(obs,-P.TAU*s.t):obs;
   renderer.draw(sphere,G.mm(G.tr(P.mul(obsDisplay,1.045)),G.sc(.061)),[.83,.96,1,1]);
   const stem=line([P.mul(obsDisplay,1.025),P.mul(obsDisplay,1.34)]);renderer.draw(stem,G.I(),[.80,.92,1,.8]);renderer.dispose(stem);
@@ -574,7 +592,7 @@ function drawSpace(){
 function drawGround(){
   renderer.draw(sphere,G.sc(50),[1,1,1,1],{sky:true,depth:false,write:false});
   if(s.grid){renderer.draw(skyGrid,G.I(),[.69,.82,.89,.24],{write:false});renderer.draw(horizon,G.I(),[.78,.90,.93,.75],{write:false});}
-  if(s.orbits)for(const id of P.IDS)if(s.enabled[id]&&pathMeshes[id])renderer.draw(pathMeshes[id],G.I(),G.rgba(META[id].color,id===s.selected?.9:.5),{write:false,lineWidth:9});
+  if(s.orbits)for(const id of P.IDS)if(s.enabled[id]&&pathMeshes[id])renderer.draw(pathMeshes[id],G.I(),G.rgba(META[id].color,id===s.selected?.9:.5),{write:false});
   for(const id of P.IDS)if(s.enabled[id]){
     const a=P.sky(id,s.t,s);if(a.alt>=0)drawSatellite(P.mul(a.direction,18),META[id].color,.98);
   }
