@@ -552,9 +552,9 @@ function drawSpace(){
   const root=G.ry(s.fixed?-P.TAU*s.t:0),earth=G.mm(root,G.ry(P.TAU*s.t));
   renderer.draw(stars,root,[.55,.70,.86,.55],{points:true,pointSize:dpr*1.45,write:false});
   renderer.draw(sphere,earth,[1,1,1,1],{texture:earthTexture,lit:true});
-  if(s.grid){renderer.draw(equator,earth,[.60,.88,.89,.7]);renderer.draw(axis,root,[.70,.81,.94,.70],{lineWidth:3});renderer.draw(meridian,earth,[.88,.95,1,.7]);}
+  if(s.grid){renderer.draw(equator,earth,[.60,.88,.89,.7]);renderer.draw(axis,root,[.70,.81,.94,.70],{lineWidth:9});renderer.draw(meridian,earth,[.88,.95,1,.7]);}
   if(s.plane)drawPlane(s.selected,root);
-  if(s.orbits)for(const id of P.IDS)if(s.enabled[id])renderer.draw(orbitMeshes[id],root,G.rgba(META[id].color,id===s.selected?.8:.5),{write:false,lineWidth:3});
+  if(s.orbits)for(const id of P.IDS)if(s.enabled[id])renderer.draw(orbitMeshes[id],root,G.rgba(META[id].color,id===s.selected?.8:.5),{write:false,lineWidth:9});
   const obs=P.observer(s.t,s),obsDisplay=s.fixed?P.ry(obs,-P.TAU*s.t):obs;
   renderer.draw(sphere,G.mm(G.tr(P.mul(obsDisplay,1.045)),G.sc(.061)),[.83,.96,1,1]);
   const stem=line([P.mul(obsDisplay,1.025),P.mul(obsDisplay,1.34)]);renderer.draw(stem,G.I(),[.80,.92,1,.8]);renderer.dispose(stem);
@@ -574,7 +574,7 @@ function drawSpace(){
 function drawGround(){
   renderer.draw(sphere,G.sc(50),[1,1,1,1],{sky:true,depth:false,write:false});
   if(s.grid){renderer.draw(skyGrid,G.I(),[.69,.82,.89,.24],{write:false});renderer.draw(horizon,G.I(),[.78,.90,.93,.75],{write:false});}
-  if(s.orbits)for(const id of P.IDS)if(s.enabled[id]&&pathMeshes[id])renderer.draw(pathMeshes[id],G.I(),G.rgba(META[id].color,id===s.selected?.9:.5),{write:false,lineWidth:3});
+  if(s.orbits)for(const id of P.IDS)if(s.enabled[id]&&pathMeshes[id])renderer.draw(pathMeshes[id],G.I(),G.rgba(META[id].color,id===s.selected?.9:.5),{write:false,lineWidth:9});
   for(const id of P.IDS)if(s.enabled[id]){
     const a=P.sky(id,s.t,s);if(a.alt>=0)drawSatellite(P.mul(a.direction,18),META[id].color,.98);
   }
